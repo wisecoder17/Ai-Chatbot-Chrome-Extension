@@ -1,0 +1,38 @@
+{
+  "name": "ai-copilot-extension",
+  "version": "1.0.0",
+  "description": "AI Copilot Extension with backend support for prompts and responses",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon backend/server.js",
+    "dev": "node backend/server.js",
+    "install-backend": "cd backend && npm install",
+    "install-all": "npm install && npm run install-backend"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "nodemon": "^2.0.22",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/ai-copilot-extension.git"
+  },
+  "keywords": [
+    "ai",
+    "chrome-extension",
+    "backend",
+    "prompts",
+    "node"
+  ],
+  "author": "Richard Ogunwole",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yourusername/ai-copilot-extension/issues"
+  },
+  "homepage": "https://github.com/yourusername/ai-copilot-extension#readme"
+}

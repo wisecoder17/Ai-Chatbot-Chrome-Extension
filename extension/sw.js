@@ -5,8 +5,6 @@ chrome.sidePanel
 
 // Listen for tab updates to manage side panel behavior
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  // if (!tab.url) return; // Skip if no URL is available for the tab
-
   try {
     // Enable the side panel universally for all sites
     await chrome.sidePanel.setOptions({
@@ -18,3 +16,4 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
     console.error("Error enabling side panel:", error);
   }
 });
+
