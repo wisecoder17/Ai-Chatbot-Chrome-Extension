@@ -12,13 +12,14 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
   
       const data = await response.json();
   
       if (response.ok) {
         // Successful login, store in localStorage
-        localStorage.setItem("user", JSON.stringify(data.user));
+        //localStorage.setItem("user", JSON.stringify(data.user));
         window.location.href = "index.html"; // Redirect to main page
       } else {
         errorMessage.style.display = "block";

@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const redis = require("../config/redis");
 
 // Sign Up
 exports.signup = async (req, res) => {
@@ -63,17 +64,36 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Incorrect Password!" });
     }
 
-    // Respond with user details 
-    res.status(200).json({
-      message: "Login successful!",
-      user: {
-        id: user._id,
-        username: user.username,
-      },
+    // Generate session ID
+    const sessionId = `session_${user._id}`;
+
+    // Store session in Redis (expires in 1 hour)
+    await redis.set(sessionId, JSON.stringify({ userId: user._id }));
+
+    // Set session cookie
+    res.cookie("sessionId", sessionId, {
+      httpOnly: true, // Prevents JavaScript access (more secure)
+      secure: true, // Only send over HTTPS (enable in production)
+      sameSite: "Strict",
+      //maxAge: 3600000, // 1 hour expiration
     });
+
+    res.status(200).json({message: "Login successful!"});
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error." });
   }
+};
+
+// Logout
+exports.logout = async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+
+  if (sessionId) {
+    await redis.del(sessionId); // Remove session from Redis
+    res.clearCookie("sessionId"); // Clear cookie
+  }
+
+  res.status(200).json({ message: "Logout successful!" });
 };
 
