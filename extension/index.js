@@ -6,7 +6,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // If no user found in localStorage, redirect to login page
     window.location.href = "login.html";
   } else {
-    // If user is logged in, show the main content
+    // If user is logged in, show the index page
     document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
   }
 });

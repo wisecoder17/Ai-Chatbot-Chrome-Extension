@@ -27,6 +27,8 @@
     "chrome-extension",
     "backend",
     "prompts",
+    "prompt-engineering",
+    "chatbot",
     "node"
   ],
   "author": "Richard Ogunwole",

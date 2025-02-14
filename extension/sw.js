@@ -11,7 +11,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
       tabId,
       enabled: true           // Enable the side panel
     });
-    console.log(`Side panel enabled for tabId: ${tabId} on URL: ${tab.url}`);
+    //console.log(`Side panel enabled for tabId: ${tabId} on URL: ${tab.url}`);
   } catch (error) {
     console.error("Error enabling side panel:", error);
   }
