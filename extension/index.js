@@ -23,7 +23,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const sessionId = getCookie("sessionId");
 
   if (!sessionId) {
-    window.location.href = "login.html"; // Redirect to login page if no session
+    window.location.href = "signup.html"; // Redirect to login page if no session
     return;
   }
 

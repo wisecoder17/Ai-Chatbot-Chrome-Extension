@@ -73,7 +73,7 @@ exports.login = async (req, res) => {
     // Set session cookie
     res.cookie("sessionId", sessionId, {
       httpOnly: true, // Prevents JavaScript access (more secure)
-      secure: true, // Only send over HTTPS (enable in production)
+      secure: false, // Only send over HTTPS (enable in production)
       sameSite: "Strict",
       //maxAge: 3600000, // 1 hour expiration
     });
