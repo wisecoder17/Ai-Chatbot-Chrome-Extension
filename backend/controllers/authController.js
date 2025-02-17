@@ -72,12 +72,12 @@ exports.login = async (req, res) => {
 
     // Set session cookie
     res.cookie("sessionId", sessionId, {
-      httpOnly: true, // Prevents JavaScript access (more secure)
-      secure: false, // Only send over HTTPS (enable in production)
-      sameSite: "Strict",
+      httpOnly: true,
+      secure: false, // Change to true in production with HTTPS
+      sameSite: "Lax", // Ensures cookies work across pages
       //maxAge: 3600000, // 1 hour expiration
     });
-
+    
     res.status(200).json({message: "Login successful!"});
   } catch (error) {
     console.error("Login error:", error);
