@@ -32,6 +32,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
         // Successful login, store in localStorage
         localStorage.setItem("user", JSON.stringify(data.userObj));
         localStorage.setItem("session", JSON.stringify(data.session));
+        localStorage.setItem("SScache", "true");
         window.location.href = "index.html"; // Redirect to main page
       } else {
         errorMessage.style.display = "block";
@@ -40,7 +41,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     } catch (error) {
       console.error("Login failed", error);
       errorMessage.style.display = "block";
-      errorMessage.textContent = "An error occurred. Please try again.";
+      errorMessage.textContent = "An error occurred. Please try again!.";
     }
   });
   

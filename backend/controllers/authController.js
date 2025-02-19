@@ -65,7 +65,7 @@ exports.login = async (req, res) => {
     }
 
     const sessionId = `session_${user._id}`; // Generate session ID
-    const EXP = 3600000; //expiration duration
+    const EXP = 3600; //expiration duration in seconds
     const userObj = {
       userId: user._id,
       username: user.username,
@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
       userObj,
       session: {
       sessionId: sessionId,
-      sessionExpiration: Date.now() + EXP,
+      sessionExpiration: Date.now() + (EXP * 1000),
       }
     });
   } catch (error) {
@@ -91,12 +91,20 @@ exports.login = async (req, res) => {
 
 // Logout
 exports.logout = async (req, res) => {
-  const sessionId = req.cookies.sessionId;
+  const { sessionId } = req.body; // Get sessionId from request body
 
-  if (sessionId) {
-    await redis.del(sessionId); // Remove session from Redis
+  if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required" });
   }
 
-  res.status(200).json({ message: "Logout successful!" });
+  try {
+      await redis.del(sessionId); // Remove session from Redis
+      // return res.json({ message: "Logged out successfully" });
+      return res.status(200).json({ message: "Logout successful!" });
+  } catch (error) {
+      console.error("Redis error:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+
 };
 

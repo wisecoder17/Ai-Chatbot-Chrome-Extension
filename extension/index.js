@@ -3,10 +3,20 @@ window.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const session = JSON.parse(localStorage.getItem("session"));
 
-  if (!user || Date.now() > session.sessionExpiration) {
+
+  if (!user || !session || Date.now() > session.sessionExpiration) {
+    // Check if the app has been opened before
+    if (localStorage.getItem("SScache")) {
+        // If session expired, show error
+        window.location.href = "login.html?error=Session expired. Please log in.";
+    } else {
+        // First timer don't show error
+        window.location.href = "login.html";
+    }
+
+    // Remove user and session data
     localStorage.removeItem("user");
-    // If no user found in localStorage, redirect to login page
-    window.location.href = "login.html?error=Session expired. Please log in.";
+    localStorage.removeItem("session");
   } else {
     // If user is logged in, show the index page
     document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
@@ -15,15 +25,34 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Logout Function
 document.getElementById("logout-button").addEventListener("click", async () => {
-  try {
-    await fetch("http://localhost:3000/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+  const session = JSON.parse(localStorage.getItem("session")); // Get session from localStorage
+  if (session && session.sessionId) {
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ sessionId: session.sessionId }), // Send sessionId to backend
+      });
 
+      if (response.ok) {
+        // Clear localStorage after successful logout
+        localStorage.removeItem("session");
+        localStorage.removeItem("user");
+        localStorage.removeItem("SScache");
+        console.log("Logged out successfully");
+        window.location.href = "login.html"; // Redirect after logout
+      } else {
+        console.error("Failed to log out");
+      }
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  } else {
+    console.error("No session found in localStorage");
     window.location.href = "login.html"; // Redirect after logout
-  } catch (error) {
-    console.error("Logout failed", error);
   }
 });
 
