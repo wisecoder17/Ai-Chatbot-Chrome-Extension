@@ -1,3 +1,13 @@
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const error = params.get("error");
+  if (error) {
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.style.display = "block";
+    errorMessage.textContent = decodeURIComponent(error);
+  }
+});
+
 document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
   
@@ -16,10 +26,12 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       });
   
       const data = await response.json();
+      console.log(data);
   
       if (response.ok) {
         // Successful login, store in localStorage
-        //localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(data.userObj));
+        localStorage.setItem("session", JSON.stringify(data.session));
         window.location.href = "index.html"; // Redirect to main page
       } else {
         errorMessage.style.display = "block";

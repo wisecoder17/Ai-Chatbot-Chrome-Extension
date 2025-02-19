@@ -64,21 +64,25 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Incorrect Password!" });
     }
 
-    // Generate session ID
-    const sessionId = `session_${user._id}`;
+    const sessionId = `session_${user._id}`; // Generate session ID
+    const EXP = 3600000; //expiration duration
+    const userObj = {
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+    }
 
     // Store session in Redis (expires in 1 hour)
-    await redis.set(sessionId, JSON.stringify({ userId: user._id }));
-
-    // Set session cookie
-    res.cookie("sessionId", sessionId, {
-      httpOnly: true,
-      secure: false, // Change to true in production with HTTPS
-      sameSite: "Lax", // Ensures cookies work across pages
-      //maxAge: 3600000, // 1 hour expiration
+    await redis.set(sessionId, JSON.stringify({userObj, EXP}));
+    await redis.expire(sessionId, EXP);
+    res.status(200).json({
+      message: "Login successful!",
+      userObj,
+      session: {
+      sessionId: sessionId,
+      sessionExpiration: Date.now() + EXP,
+      }
     });
-    
-    res.status(200).json({message: "Login successful!"});
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -91,7 +95,6 @@ exports.logout = async (req, res) => {
 
   if (sessionId) {
     await redis.del(sessionId); // Remove session from Redis
-    res.clearCookie("sessionId"); // Clear cookie
   }
 
   res.status(200).json({ message: "Logout successful!" });

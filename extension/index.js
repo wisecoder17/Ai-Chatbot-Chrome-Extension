@@ -1,33 +1,16 @@
-// // Check if user is logged in by checking localStorage
-// window.addEventListener("DOMContentLoaded", () => {
-//   const user = JSON.parse(localStorage.getItem("user"));
+// Check if user is logged in by checking localStorage
+window.addEventListener("DOMContentLoaded", () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const session = JSON.parse(localStorage.getItem("session"));
 
-//   if (!user) {
-//     // If no user found in localStorage, redirect to login page
-//     window.location.href = "login.html";
-//   } else {
-//     // If user is logged in, show the index page
-//     document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
-//   }
-// });
-
-
-// Function to get cookie value by name
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return match ? match[2] : null;
-}
-
-// Check if session exists
-window.addEventListener("DOMContentLoaded", async () => {
-  const sessionId = getCookie("sessionId");
-
-  if (!sessionId) {
-    window.location.href = "signup.html"; // Redirect to login page if no session
-    return;
+  if (!user || Date.now() > session.sessionExpiration) {
+    localStorage.removeItem("user");
+    // If no user found in localStorage, redirect to login page
+    window.location.href = "login.html?error=Session expired. Please log in.";
+  } else {
+    // If user is logged in, show the index page
+    document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
   }
-
-  document.getElementById("response").innerText = `Welcome back!`;
 });
 
 // Logout Function
