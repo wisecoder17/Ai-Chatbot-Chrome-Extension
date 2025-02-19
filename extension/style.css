@@ -33,4 +33,7 @@ button:hover {
   margin-top: 20px;
   font-size: 14px;
 }
-  
+#loading {
+  font-size: 14px;
+  color: #555;
+} 

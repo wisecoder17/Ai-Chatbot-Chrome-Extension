@@ -1,0 +1,11 @@
+{
+    "watch": ["backend"],                
+    "ext": "js,json",                      
+    "exec": "node backend/server.js",     
+    "ignore": ["backend/node_modules"],   
+    "env": {
+      "NODE_ENV": "development"            
+    },
+    "legacyWatch": true                    
+  }
+  
