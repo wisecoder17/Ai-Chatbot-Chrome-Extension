@@ -65,7 +65,7 @@ exports.login = async (req, res) => {
     }
 
     const sessionId = `session_${user._id}`; // Generate session ID
-    const EXP = 3600; //expiration duration in seconds
+    const EXP = 3600; //expiration duration in second
     const userObj = {
       userId: user._id,
       username: user.username,
