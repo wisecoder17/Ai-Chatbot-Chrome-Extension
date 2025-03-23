@@ -1,3 +1,4 @@
+import process from "./config.js";
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const error = params.get("error");
@@ -16,7 +17,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     const errorMessage = document.getElementById("error-message");
   
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch(`${process.BASE_URL}api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

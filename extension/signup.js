@@ -1,3 +1,4 @@
+import process from "./config.js";
 document.getElementById("signup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
   
@@ -8,7 +9,7 @@ document.getElementById("signup-form").addEventListener("submit", async (e) => {
     const successMessage = document.getElementById("success-message");
   
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
+      const response = await fetch(`${process.BASE_URL}api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+import process from "./config.js";
 // Check if user is logged in by checking localStorage
 window.addEventListener("DOMContentLoaded", () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -17,6 +18,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // Remove user and session data
     localStorage.removeItem("user");
     localStorage.removeItem("session");
+    localStorage.removeItem("SScache");
   } else {
     // If user is logged in, show the index page
     document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
@@ -28,7 +30,7 @@ document.getElementById("logout-button").addEventListener("click", async () => {
   const session = JSON.parse(localStorage.getItem("session")); // Get session from localStorage
   if (session && session.sessionId) {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
+      const response = await fetch(`http://${process.BASE_URL}/api/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,6 +44,7 @@ document.getElementById("logout-button").addEventListener("click", async () => {
         localStorage.removeItem("session");
         localStorage.removeItem("user");
         localStorage.removeItem("SScache");
+        
         console.log("Logged out successfully");
         window.location.href = "login.html"; // Redirect after logout
       } else {
