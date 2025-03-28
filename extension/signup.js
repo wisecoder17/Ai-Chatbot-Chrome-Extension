@@ -9,7 +9,7 @@ document.getElementById("signup-form").addEventListener("submit", async (e) => {
     const successMessage = document.getElementById("success-message");
   
     try {
-      const response = await fetch(`${process.BASE_URL}api/auth/signup`, {
+      const response = await fetch(`${process.BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

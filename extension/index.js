@@ -1,68 +1,59 @@
 import process from "./config.js";
-// Check if user is logged in by checking localStorage
+import { sendQuery } from "./utils/api.js";
+
+// Check if user is logged in by checking chrome.storage
 window.addEventListener("DOMContentLoaded", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const session = JSON.parse(localStorage.getItem("session"));
+  chrome.storage.local.get(["user", "session", "SScache"], (result) => {
+    const user = result.user;
+    const session = result.session;
+    const sessionExists = result.SScache;
 
-
-  if (!user || !session || Date.now() > session.sessionExpiration) {
-    // Check if the app has been opened before
-    if (localStorage.getItem("SScache")) {
-        // If session expired, show error
+    if (!user || !session || Date.now() > session.sessionExpiration) {
+      if (sessionExists) {
         window.location.href = "login.html?error=Session expired. Please log in.";
-    } else {
-        // First timer don't show error
+      } else {
         window.location.href = "login.html";
-    }
+      }
 
-    // Remove user and session data
-    localStorage.removeItem("user");
-    localStorage.removeItem("session");
-    localStorage.removeItem("SScache");
-  } else {
-    // If user is logged in, show the index page
-    document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
-  }
+      chrome.storage.local.remove(["user", "session", "SScache"]);
+    } else {
+      document.getElementById("response").innerText = `Welcome back, ${user.username}!`;
+    }
+  });
 });
 
 // Logout Function
 document.getElementById("logout-button").addEventListener("click", async () => {
-  const session = JSON.parse(localStorage.getItem("session")); // Get session from localStorage
-  if (session && session.sessionId) {
-    try {
-      const response = await fetch(`http://${process.BASE_URL}/api/auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ sessionId: session.sessionId }), // Send sessionId to backend
-      });
+  chrome.storage.local.get("session", async (result) => {
+    const session = result.session;
+    
+    if (session && session.sessionId) {
+      try {
+        const response = await fetch(`http://${process.BASE_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ sessionId: session.sessionId }),
+        });
 
-      if (response.ok) {
-        // Clear localStorage after successful logout
-        localStorage.removeItem("session");
-        localStorage.removeItem("user");
-        localStorage.removeItem("SScache");
-        
-        console.log("Logged out successfully");
-        window.location.href = "login.html"; // Redirect after logout
-      } else {
-        console.error("Failed to log out");
+        if (response.ok) {
+          chrome.storage.local.remove(["user", "session", "SScache"], () => {
+            console.log("Logged out successfully");
+            window.location.href = "login.html";
+          });
+        } else {
+          console.error("Failed to log out");
+        }
+      } catch (error) {
+        console.error("Logout failed", error);
       }
-    } catch (error) {
-      console.error("Logout failed", error);
+    } else {
+      console.error("No session found in localStorage");
+      window.location.href = "login.html";
     }
-  } else {
-    console.error("No session found in localStorage");
-    window.location.href = "login.html"; // Redirect after logout
-  }
+  });
 });
 
-
-
-
-import { sendQuery } from "./utils/api.js";
 
 document.getElementById("send-button").addEventListener("click", async () => {
   const query = document.getElementById("query").value;

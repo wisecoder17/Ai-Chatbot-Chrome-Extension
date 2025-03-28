@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes"); 
-const messageRoute = require("./routes/messageRoute"); 
+const promptRoute = require("./routes/promptRoutes"); 
 const sessionRoute = require("./routes/sessionRoute"); 
 
 const app = express();
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 //  Routes
 app.use("/api/auth", authRoutes); 
 app.use("/api/session", sessionRoute); 
-app.use("/api", messageRoute);
+app.use("/api", promptRoute);
 
 
 module.exports = app;

@@ -5,7 +5,8 @@
   "description": "A sliding panel for AI interactions.",
   "permissions": [
     "sidePanel",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "side_panel": {
     "default_path": "index.html"
