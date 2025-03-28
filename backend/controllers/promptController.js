@@ -1,83 +1,64 @@
 require('dotenv').config({ path: '../../.env' });
 const config = require("../config");
 // const redis = require("../config/redis"); // Redis temporarily disabled
-const Context = require("../models/prompt");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+// const Context = require("../models/prompt"); // DB temporarily disabled
+const { GoogleGenAI } = require("@google/genai");
 
 class PromptManager {
-  static baseSystemPrompt(userInput) {
-    return [
-      {
-        role: "user",
-        parts: [{ text: "You are a helpful AI assistant. Keep responses concise." }]
-      },
-      {
-        role: "user",
-        parts: [{ text: userInput }]
-      }
-    ];
+  static systemInstruction() {
+    return "You are a helpful AI assistant. Keep responses concise.";
+  }
+
+  static formatUserMessage(userInput) {
+    return { role: "user", parts: [{ text: userInput }] };
+  }
+
+  static formatModelMessage(responseText) {
+    return { role: "model", parts: [{ text: responseText }] };
   }
 }
 
-const callGemini = async (query) => {
-  try {
-    const genAI = new GoogleGenerativeAI(config.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Use latest model if available
+let conversationHistory = [];
+const createChatSession = async () => {
+  const genAI = new GoogleGenAI({ apiKey: config.env.GEMINI_API_KEY });
 
-    const requestPayload = { contents: query }; 
-
-    const result = await model.generateContent(requestPayload);
-    console.log("Gemini API Result:", result);    
-    // Extract response correctly
-    const responseText = result.response.text();
-
-    if (!responseText) {
-      throw new Error("No valid response from Gemini API.");
-    }
-
-    console.log("Gemini Response:", responseText);
-    return responseText;
-  } catch (error) {
-    console.error("Gemini API Error:", error.message);
-    throw new Error("Failed to call Gemini API");
-  }
+  const chat = genAI.chats.create({
+    model: "gemini-2.0-flash",
+    history: conversationHistory, // Start with an empty conversation history
+    config: {
+      systemInstruction: PromptManager.systemInstruction(),
+      temperature: 0.7, 
+      maxOutputTokens: 500,
+    },
+  });
+  return chat;
+  
 };
+console.log(conversationHistory);
+
 
 const handleChat = async (req, res) => {
-  const { query } = req.body;
-  const sessionId = "default-session";
+  const { query, sessionId } = req.body;
 
   try {
-    // Temporarily disabling Redis for debugging
-    let context = []; 
-    
-    // Prompt Manager
-    const prompt = PromptManager.baseSystemPrompt(query);
-    context.push(...prompt);
+    // Initialize or retrieve chat session (replace with Redis/DB logic later)
+    if (!global.chatSessions) global.chatSessions = {};
+    if (!global.chatSessions[sessionId]) {
+      global.chatSessions[sessionId] = await createChatSession();
+    }
+    const chat = global.chatSessions[sessionId];
 
-    // Call Gemini API with properly formatted messages
-    const response = await callGemini(context);
+    // Send user message
+    const response = await chat.sendMessage({ message: query });
 
-    // Push assistant's response correctly
-    context.push({
-      role: "model",
-      parts: [{ text: response }]
-    });
+    // Log session ID and response
+    console.log(`Session ID: ${sessionId}`);
+    console.log("AI Response:", response.text);
 
-    // Temporarily disable Redis storage
-    /*
-    await redis.set(sessionId, JSON.stringify(context), "EX", 3600);
-    await Context.findOneAndUpdate(
-      { sessionId },
-      { context },
-      { upsert: true }
-    );
-    */
+    res.json({ sessionId, response: response.text });
 
-    res.json({ response });
-    console.log("Response:", response);
   } catch (error) {
-    console.error("Error in handleChat:", error);
+    console.error("Chat Handling Error:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
